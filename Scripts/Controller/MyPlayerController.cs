@@ -13,12 +13,13 @@ namespace Assets.Scripts.Controller
         [SerializeField]
         private Transform Player;
 
-        // ------------------- cinemahcine ---------------------
-        CinemachineController _camController;
+        // ------------------- Cinemahcine Update 관련 변수 ---------------------
+        public CinemachineController CamController;
+        // ----------------------------------------------------------------------
 
 
 
-        // ------------------- move ---------------------
+        // ----------------------- Move Update 관련 변수 ------------------------
         public bool useCharacterForward = false;
         private float speed = 0f;
         private float direction = 0f;
@@ -28,33 +29,55 @@ namespace Assets.Scripts.Controller
         private float turnSpeedMultiplier;
         private Vector3 targetDirection;
         private Vector2 input;
+        // ----------------------------------------------------------------------
 
 
 
-        // ------------------- update ---------------------
-        public Animator playerAnimator;
-        
-        bool _updated = false; // 1. STATE가 바뀌거나 2. 위치가 바뀌거나
-        bool _interactable = false;
-        bool _inputable = true; 
+        // ----------------------- State Update 관련 변수------------------------
+
+        // 애니메이션 및 particleSystem
+        public Animator playerAnimator; // 플레이어 애니메이터
+        public ParticleSystem slashEffectController; // 검기 이펙트
+        public ParticleSystem dashEffectController; // 대쉬 이펙트
+        public Transform UltimateBackGround; // 궁극기 연출용 배경
+
+
+        bool _updated = false; // 서버상태 업데이트 여부 1. STATE가 바뀌거나 2. 위치가 바뀌거나
+        bool _interactable = false; // 상호작용 가능 여부
+        bool _inputable = true; // 키 입력 가능 여부
 
         public int WeaponDamage { get; private set; }
         public int ArmorDefence { get; private set; }
 
+        public bool _isMultiPlay = false; // 기본으로 싱글 플레이로 설정
+        // ----------------------------------------------------------------------
 
+
+
+        // ------------------------- 플레이어 초기화 ----------------------------
         protected override void Init()
         {
             base.Init();
 
-            InitAnimator();
+            InitAnimAndParticlesys();
             InitCAM();
 
             RefreshAdditionalStat();
         }
 
-        private void InitAnimator()
+        private void InitAnimAndParticlesys() // 애니메이터 및 이펙트를 위한 파티클 시스템 획득
         {
-            playerAnimator = Player.GetComponentInChildren<Animator>();
+            // playerAnimator = Player.GetComponentInChildren<Animator>();
+            playerAnimator = transform.GetComponent<Animator>();
+
+            Transform slashParticle = transform.GetChild(0)
+                .Find("Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/HandGrip").GetChild(0).GetChild(0);
+            slashEffectController = slashParticle.GetComponent<ParticleSystem>();
+
+            Transform dashParticle = transform.Find("DashParticle");
+            dashEffectController = dashParticle.GetComponent<ParticleSystem>();
+
+            UltimateBackGround = transform.Find("UltimateBackground");
         }
 
         private void InitCAM()
@@ -63,10 +86,10 @@ namespace Assets.Scripts.Controller
             
             if (cinemachineController != null)
             {
-                _camController = cinemachineController.GetComponent<CinemachineController>();
+                CamController = cinemachineController.GetComponent<CinemachineController>();
 
-                _camController.setTarget(transform);
-                _camController.setCinemachineAnim("TPS");
+                CamController.setTarget(transform);
+                CamController.setCinemachineAnim("TPS");
             }
 
         }
@@ -98,7 +121,11 @@ namespace Assets.Scripts.Controller
         }
 
 
-        // --------------- Position --------------------
+        // ----------------------------------------------------------------------
+
+
+
+        // ---------------------------- Position --------------------------------
         // state를 포함한 위치 정보
         public override PositionInfo PosInfo
         {
@@ -217,6 +244,12 @@ namespace Assets.Scripts.Controller
                 if (STATE == value)
                     return;
 
+                if(_state == CharacterState.Sprint)
+                {
+                    if (dashEffectController.isPlaying)
+                        dashEffectController.Stop(); // 대시 이펙트 재생 중지
+                }
+
                 _state = value;
 
                 switch (_state)
@@ -289,6 +322,7 @@ namespace Assets.Scripts.Controller
         {
             CheckAttack();
             PosInfo.State = CreateureState.Idle;
+            _inputable = true;
         }
 
         protected override void UpdateWalk()
@@ -303,6 +337,8 @@ namespace Assets.Scripts.Controller
 
         protected override void UpdateSprint()
         {
+            if (!dashEffectController.isPlaying) // 대쉬 이펙트 재생
+                dashEffectController.Play();
 
             if (STATE == CharacterState.Idle || STATE == CharacterState.Walk || STATE == CharacterState.Sprint)
             {
@@ -334,7 +370,7 @@ namespace Assets.Scripts.Controller
 
       
 
-        // Network Update
+        // -------------------- Network Update -------------------------
         void CheckUpdatedFlag()
         {
             // 업데이트 직전에 위치를 갱신
@@ -365,73 +401,21 @@ namespace Assets.Scripts.Controller
         }
 
 
-        void CheckAttack()
-        {
-            if (_coSkillCooltime == null && Input.GetMouseButtonDown(0))
-            {
-                // 바로 상태를 변경하는 것이 아니라 서버에 공격하겠다는 요청이 우선
-                C_Skill skill = new C_Skill() { Info = new SkillInfo() };
-                skill.Info.SkillId = 1; // 기본 스킬이라고 가정
-                Managers.Network.Send(skill); // 스킬 정보 전송
-
-                _coSkillCooltime = StartCoroutine("CoInputColltime", 0.5f);
-            }
-        }
-
-        public void UseSkill(int skillId)
-        {
-            if (skillId == 1) // 기본 공격
-            {
-                StartCoroutine(CoAttack());
-            }
-        }
-
-        // 스킬 발동
-        IEnumerator CoAttack()
-        {
-            _inputable = false;
-
-            STATE = CharacterState.Attack; // 상태 업데이트
-            playerAnimator.SetFloat("normalAttack", 1);
-
-            // 0.9초 이내에 마우스가 다시 눌렸다면 2단 공격
-            yield return new WaitForSeconds(0.9f);
-
-            playerAnimator.SetFloat("normalAttack", 0);
-            STATE = CharacterState.Idle;
-
-            _inputable = true;
-
-        }
-
-
-        IEnumerator CoKnockBack()
-        {
-            _inputable = false;
-
-            // 애니메이션 재생 시간동안 움직이지 못한다
-            yield return new WaitForSeconds(1.05f);
-
-            STATE = CharacterState.Idle;
-
-            _inputable = true;
-        }
+        
 
         public override void OnDead()
         {
             STATE = CharacterState.Dead;
-            // TODO
-            // 부활 여부를 묻는 UI
+            // TODO : 부활 여부를 묻는 UI 
         }
+        // -------------------------------------------------------------
 
 
-        // -----------------------------------------------------
+
 
         void Start()
         {
             Init();
-            
-
         }
 
         void Update()
@@ -441,6 +425,8 @@ namespace Assets.Scripts.Controller
 
             UpdateState();
         }
+
+
 
     }
 }

@@ -47,6 +47,8 @@ public class AnimationEvents_Player : MonoBehaviour
 
     }
 
+    
+
     void moveForward()
     {
         // charBody.position += transform.forward * 0.2f;

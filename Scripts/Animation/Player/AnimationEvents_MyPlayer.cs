@@ -1,4 +1,5 @@
-﻿using Google.Protobuf.Protocol;
+﻿using Assets.Scripts.Controller;
+using Google.Protobuf.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,10 +9,6 @@ using UnityEngine;
 
 public class AnimationEvents_MyPlayer : MonoBehaviour
 {
-    [SerializeField]
-    Transform _myPlayerObject;
-
-
     CreatureController _controller;
     StatData_player _stat;
     Animator _animator;
@@ -21,8 +18,6 @@ public class AnimationEvents_MyPlayer : MonoBehaviour
 
     private void Start()
     {
-        if (_myPlayerObject == null)
-            _myPlayerObject = transform.parent;
 
         // 공격할 수 있는 레이어
         _hittalbeMask = LayerMask.GetMask("Monster");
@@ -34,7 +29,7 @@ public class AnimationEvents_MyPlayer : MonoBehaviour
         _animator = transform.GetComponent<Animator>();
 
         // 스테이트 조절을 위해 컨트롤러를 가져온다
-        _controller = _myPlayerObject.GetComponent<CreatureController>();
+        _controller = transform.GetComponent<CreatureController>();
     }
 
     void OnRunEvent()
@@ -48,17 +43,15 @@ public class AnimationEvents_MyPlayer : MonoBehaviour
 
     }
 
-    void moveForward()
+    void setCinemachine(string cam)
     {
-        //// charBody.position += transform.forward * 0.2f;
-        //Rigidbody rigidBody = _myPlayerObject.GetComponent<Rigidbody>();
-        //rigidBody.AddForce(transform.forward * 5.0f);
-    }
+        Debug.Log(cam);
+        MyPlayerController myPlayerController = _controller as MyPlayerController;
 
-    void moveBackward()
-    {
-        //Rigidbody rigidBody = _myPlayerObject.GetComponent<Rigidbody>();
-        //rigidBody.AddForce(-transform.forward * 20.0f);
+        if (cam == "TPS")
+            myPlayerController.UltimateBackGround.gameObject.SetActive(false);
+        
+        myPlayerController.CamController.setCinemachineAnim(cam);
     }
 
     List<int> _targetIds = new List<int>();
