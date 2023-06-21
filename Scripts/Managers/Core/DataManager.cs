@@ -1,3 +1,4 @@
+using Google.Protobuf.Protocol;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,20 +14,24 @@ public interface ILoader<Key, Value>
 
 public class DataManager
 {
-    public Dictionary<int, Data.Skill> SkillDict { get; private set; } = new Dictionary<int, Data.Skill>();
-    public Dictionary<int, Data.ItemData> ItemDict { get; private set; } = new Dictionary<int, Data.ItemData>();
-    public Dictionary<int, Data.BossMonsterData> BossMonsterDict { get; private set; } = new Dictionary<int, Data.BossMonsterData>();
+    public Dictionary<int, StatInfo> StatDict { get; private set; } = new Dictionary<int, StatInfo>(); // 캐릭터 레벨당 스탯 데이터
+    public Dictionary<int, Data.Skill> SkillDict { get; private set; } = new Dictionary<int, Data.Skill>(); // 캐릭터 스킬 관련 데이터
+    public Dictionary<int, Data.ItemData> ItemDict { get; private set; } = new Dictionary<int, Data.ItemData>(); // 아이템 관련 데이터
+    public Dictionary<int, Data.BossMonsterData> BossMonsterDict { get; private set; } = new Dictionary<int, Data.BossMonsterData>(); // 보스 몬스터 관련 데이터
 
-
+    // 복호화 키
     static readonly string aes_key = "AXe8YwuIn1zxt3FPWTZFlAa14EHdPAdN9FaZ9RQWihc="; //44자
     static readonly string aes_iv = "bsxnWolsAyO7kCfWuyrnqg=="; //24자
 
-    static string[] encryptedFilePaths = new string[] { "ItemData.json" };
-
     public void Init()
     {
+        StatDict = LoadJson<Data.StatData, int, StatInfo>("StatData.encrypted").MakeDict();
+
+        // TODO : 스킬 데이터 처리
         // SkillDict = LoadJson<Data.SkillData, int, Data.Skill>("SkillData").MakeDict();
         ItemDict = LoadJson<Data.ItemLoader, int, Data.ItemData>("ItemData.encrypted").MakeDict();
+
+        // TODO : 보스 몬스터 데이터 처리
         // BossMonsterDict = LoadJson<Data.BossMonsterLoader, int, Data.BossMonsterData>("BossMonsterData").MakeDict();
     }
 
@@ -43,7 +48,7 @@ public class DataManager
         return Newtonsoft.Json.JsonConvert.DeserializeObject<Loader>(decryptedJsonFile);
     }
 
-    // 복호화 함수
+    // 복호화 처리 함수
     public static string DecryptAES(string encryptedText)
     {
         string decrypted = null;

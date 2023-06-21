@@ -41,6 +41,8 @@ public class UI_Stat : UI_Base
     enum Texts
     {
         NameText,
+        LevelText,
+        ExpText,
         AttackValueText,
         DefenceValueText
     }
@@ -112,11 +114,29 @@ public class UI_Stat : UI_Base
         player.RefreshAdditionalStat(); // 능력치 재계산
 
         Get<Text>((int)Texts.NameText).text = player.name;
+        
 
         int totalDamage = player.Stat.Attack + player.WeaponDamage;
         Get<Text>((int)Texts.AttackValueText).text = $"{totalDamage} + {player.WeaponDamage}";
         Get<Text>((int)Texts.DefenceValueText).text = $"{player.ArmorDefence}";
+        Get<Text>((int)Texts.LevelText).text = $" Lv.{player.Stat.Level}";
+
+        
+        StatInfo curStatInfo = null;
+        Managers.Data.StatDict.TryGetValue(player.Stat.Level, out curStatInfo);
+        StatInfo nextStatInfo = null;
+        Managers.Data.StatDict.TryGetValue(player.Stat.Level + 1, out nextStatInfo);
 
 
+        int curExp = player.Stat.TotalExp - curStatInfo.TotalExp;
+        Get<Text>((int)Texts.ExpText).text = $"{curExp}/{(nextStatInfo.TotalExp - curStatInfo.TotalExp)}";
+
+        float expRatio = (float) curExp / (nextStatInfo.TotalExp - curStatInfo.TotalExp);
+        SetExpBar(expRatio);
+    }
+
+    void SetExpBar(float expRatio) 
+    {
+        transform.Find("ExpBar").GetComponent<Slider>().value = expRatio; 
     }
 }

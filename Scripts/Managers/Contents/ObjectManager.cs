@@ -64,8 +64,8 @@ public class ObjectManager
 		}
 	}
 
-	// 위치 지정 스폰
-	public void Add(ObjectInfo info, Vector3 position, Quaternion rotation, bool myPlayer = false)
+	// 위치 지정 플레이어 스폰
+	public void Add(ObjectInfo info, Vector3 position, Quaternion rotation, bool myPlayer = false, string playerSceneType = null) // 본인 플레이어외의 다른 플레이어도 해당 함수 이용
 	{
 		GameObjectType objectType = GetObjectTypeById(info.ObjectId);
 		Debug.Log($"{objectType}, {info.ObjectId}");
@@ -75,7 +75,12 @@ public class ObjectManager
 			{
 				Debug.Log("PlayerLoad");
 
-				GameObject go = Managers.Resource.Instantiate("Creature/MyPlayer", position, rotation);
+				GameObject go = null;
+				if (playerSceneType == "Lobby")
+					go = Managers.Resource.Instantiate("Creature/MyPlayer_Lobby", position, rotation);
+				else if(playerSceneType == "Game")
+					go = Managers.Resource.Instantiate("Creature/MyPlayer_Game", position, rotation);
+
 				go.name = info.Name;
 				_objects.Add(info.ObjectId, go);
 

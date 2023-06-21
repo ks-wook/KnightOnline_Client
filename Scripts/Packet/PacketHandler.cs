@@ -18,16 +18,15 @@ class PacketHandler
 		Debug.Log("게임 입장 패킷 수신");
 
 		S_EnterGame enterGamePacket = packet as S_EnterGame;
-
-
 		Managers.Object.Add(enterGamePacket.Player, myPlayer: true);
-
 	}
 
 	public static void S_EnterLobbyHandler(PacketSession session, IMessage packet)
 	{
+		Debug.Log("로비 입장 패킷 수신");
+
 		S_EnterLobby enterGamePacket = (S_EnterLobby)packet;
-		Managers.Object.Add(enterGamePacket.Player, new Vector3(30, 0, 50), new Quaternion(0, 0, 0, 0), myPlayer: true);
+		Managers.Object.Add(enterGamePacket.Player, new Vector3(30, 0, 50), new Quaternion(0, 0, 0, 0), myPlayer: true, "Lobby");
 	}
 
 	public static void S_LeaveGameHandler(PacketSession session, IMessage packet)
@@ -41,7 +40,6 @@ class PacketHandler
 		S_Spawn spawnPacket = packet as S_Spawn;
 		foreach (ObjectInfo obj in spawnPacket.Objects)
 		{
-
 			Managers.Object.Add(obj, myPlayer: false);
 		}
 	}
@@ -350,5 +348,32 @@ class PacketHandler
 
 		Managers.Quest.IsRecievedPlayerQuestsByServer = true;
 		Managers.Quest.FlushQuestDialogueTaskQueue();
+	}
+
+	public static void S_GetExpHandler(PacketSession session, IMessage packet)
+	{
+		S_GetExp expPacket = packet as S_GetExp;
+		Managers.Object.MyPlayer.Stat.TotalExp = expPacket.TotalExp;
+		Debug.Log("total exp: " + expPacket.TotalExp);
+	}
+
+	public static void S_LevelUpHandler(PacketSession session, IMessage packet)
+	{
+		S_LevelUp levelUpPacket = packet as S_LevelUp;
+
+		Debug.Log("플레이어 레벨 업");
+
+		// TODO : 플레이어 레벨 업에 대한 적용
+		Managers.Object.MyPlayer.LevelUp(levelUpPacket);
+
+
+		// TODO : 레벨 업 팝업 ui 띄우기
+		UI_LevelUpPopup levelUpPopup = Managers.UI.ShowPopupUI<UI_LevelUpPopup>();
+		levelUpPopup.SetLevelUpPop(levelUpPacket.NewLevel);
+
+
+
+
+
 	}
 }

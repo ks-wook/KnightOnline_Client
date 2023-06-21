@@ -46,10 +46,23 @@ namespace Assets.Scripts.Controller
         bool _interactable = false; // 상호작용 가능 여부
         bool _inputable = true; // 키 입력 가능 여부
 
+        [HideInInspector]
         public int WeaponDamage { get; private set; }
+
+        [HideInInspector]
         public int ArmorDefence { get; private set; }
 
+        [HideInInspector]
         public bool _isMultiPlay = false; // 기본으로 싱글 플레이로 설정
+
+        [HideInInspector]
+        public Define.Scene currentScene; // 현재 씬 타입
+
+
+        Transform _handGrip = null; // 손에 쥔 무기 프리팹
+        Transform _backGrip = null; // 등에 멘 무기 프리팹
+
+        Transform _lastWeapon = null; // 마지막에 장착하고 있던 무기
         // ----------------------------------------------------------------------
 
 
@@ -62,7 +75,12 @@ namespace Assets.Scripts.Controller
             InitAnimAndParticlesys();
             InitCAM();
 
-            RefreshAdditionalStat();
+
+            currentScene = Managers.Scene.CurrentScene.SceneType;
+
+            // TEMP : 플레이어 테스트용
+            // currentScene = Define.Scene.Game;
+            //-------------------------
         }
 
         private void InitAnimAndParticlesys() // 애니메이터 및 이펙트를 위한 파티클 시스템 획득
@@ -70,9 +88,12 @@ namespace Assets.Scripts.Controller
             // playerAnimator = Player.GetComponentInChildren<Animator>();
             playerAnimator = transform.GetComponent<Animator>();
 
-            Transform slashParticle = transform.GetChild(0)
-                .Find("Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/HandGrip").GetChild(0).GetChild(0);
-            slashEffectController = slashParticle.GetComponent<ParticleSystem>();
+            _handGrip = transform.GetChild(0)
+                .Find("Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/HandGrip");
+            slashEffectController = _handGrip.GetChild(0).GetChild(0).GetComponent<ParticleSystem>();
+
+            _backGrip = transform.GetChild(0)
+                .Find("Root/Hips/Spine_01/Spine_02/BackGrip");
 
             Transform dashParticle = transform.Find("DashParticle");
             dashEffectController = dashParticle.GetComponent<ParticleSystem>();
@@ -111,6 +132,23 @@ namespace Assets.Scripts.Controller
                 {
                     case ItemType.Weapon:
                         WeaponDamage += ((Weapon)item).Damage;
+                        Debug.Log("Refresh Stat");
+
+                        // TODO : 아이템 프리팹 활성화
+                        if (_lastWeapon != null)
+                            _lastWeapon.gameObject.SetActive(false);
+
+                        if (currentScene == Define.Scene.Lobby1)
+                        {
+                            _lastWeapon = _backGrip.Find("Weapon_Prefab_" + item.TemplateId.ToString());
+                            _lastWeapon.gameObject.SetActive(true);
+                        }
+                        else if (currentScene == Define.Scene.Game)
+                        {
+                            _lastWeapon = _handGrip.Find("Weapon_Prefab_" + item.TemplateId.ToString());
+                            _lastWeapon.gameObject.SetActive(true);
+                        }
+
                         break;
                     case ItemType.Armor:
                         ArmorDefence += ((Armor)item).Defence;
@@ -119,7 +157,6 @@ namespace Assets.Scripts.Controller
             }
 
         }
-
 
         // ----------------------------------------------------------------------
 
@@ -230,11 +267,11 @@ namespace Assets.Scripts.Controller
             }
         }
 
-        // ---------------------------------------------------
+        // ---------------------------------------------------------------
 
 
 
-        // -------------------- State ------------------------
+        // --------------------------- State -----------------------------
         // 애니메이션 관련 업데이트
         public override CharacterState STATE
         {
@@ -320,6 +357,7 @@ namespace Assets.Scripts.Controller
 
         protected override void UpdateIdle()
         {
+            if(currentScene == Define.Scene.Game)
             CheckAttack();
             PosInfo.State = CreateureState.Idle;
             _inputable = true;
@@ -327,7 +365,9 @@ namespace Assets.Scripts.Controller
 
         protected override void UpdateWalk()
         {
-            CheckAttack();
+            if (currentScene == Define.Scene.Game)
+                CheckAttack();
+
             if (_inputable)
                 MovePosition();
 
@@ -345,7 +385,8 @@ namespace Assets.Scripts.Controller
                 STATE = CharacterState.Sprint;
             }
 
-            CheckAttack();
+            if (currentScene == Define.Scene.Game)
+                CheckAttack();
 
             if (_inputable)
                 MovePosition();
@@ -359,18 +400,37 @@ namespace Assets.Scripts.Controller
             // TODO
         }
 
-        
-        // -----------------------------------------------------------
+        public void GetExp(int exp)
+        {
+            C_GetExp expPacket = new C_GetExp();
+            expPacket.TotalExp = this.Stat.TotalExp + exp;
+            Managers.Network.Send(expPacket);
+        }
+
+        public void LevelUp(S_LevelUp levelUpPacket)
+        {
+            StatInfo newStat = null;
+            Managers.Data.StatDict.TryGetValue(levelUpPacket.NewLevel, out newStat);
+
+            Stat.Level = levelUpPacket.NewLevel;
+            Stat.TotalExp = levelUpPacket.TotalExp;
+            Stat.MaxHp = newStat.MaxHp;
+            Stat.Hp = newStat.MaxHp;
+            Stat.Attack = newStat.Attack;
+        }
+
+
+        // -------------------------------------------------------------------
 
 
 
 
-        
 
 
-      
 
-        // -------------------- Network Update -------------------------
+
+
+        // -------------------------- Network Update -------------------------
         void CheckUpdatedFlag()
         {
             // 업데이트 직전에 위치를 갱신
@@ -416,6 +476,7 @@ namespace Assets.Scripts.Controller
         void Start()
         {
             Init();
+            RefreshAdditionalStat(); // 아이템에 의한 추가 능력치 refresh
         }
 
         void Update()

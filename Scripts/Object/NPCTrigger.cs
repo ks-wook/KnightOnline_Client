@@ -7,9 +7,12 @@ using static QuestManager;
 public class NPCTrigger : InterActionTrigger
 {
     [SerializeField]
-    public string Name = "NPC";
+    public string Name = "NPC"; // default 이름, 에디터에서 설정
 
-    // ------------------- Dialogue ---------------------
+    [SerializeField]
+    public int npcID = 0; // default id, 에디터에서 설정
+
+    // ------------------- Dialogue 관련 변수 -----------------------
     [HideInInspector]
     public string[] NPCDialogue = null;
 
@@ -18,15 +21,17 @@ public class NPCTrigger : InterActionTrigger
 
     [HideInInspector]
     public int scriptId = 1;
-    // ---------------------------------------------------
-
 
     QuestMarker _questMarker;
+    // --------------------------------------------------------------
+
+
+
+    // ------------------- 애니메이션 관련 변수 ---------------------
+    [HideInInspector]
     public Animator _npcAnimator;
 
-
     ObjectState state = ObjectState.Idle;
-
     public ObjectState STATE
     {
         get { return state; }
@@ -49,7 +54,13 @@ public class NPCTrigger : InterActionTrigger
             }
         }
     }
+    // --------------------------------------------------------------
 
+
+
+
+
+    // --------------------- NPC Conversation ------------------------
 
     // NPC 대화 스크립트 설정 (Dialogue Manager 에서 호출)
     public void InitDialouge((string[] scripts, int questNum) scriptsAndQuest)
@@ -135,6 +146,13 @@ public class NPCTrigger : InterActionTrigger
         STATE = ObjectState.Idle; // idle 상태 초기화
     }
 
+    // ---------------------------------------------------------------
+
+
+
+
+    // ------------------------ NPC Quest ----------------------------
+
     // 퀘스트 마커 추가
     private void AddQuestMarker()
     {
@@ -143,16 +161,20 @@ public class NPCTrigger : InterActionTrigger
         _questMarker = go.GetComponent<QuestMarker>();
     }
 
+    // ----------------------------------------------------------------
+
+
+
     // 애니메이터 획득
     private void InitAnimator()
     {
-        _npcAnimator = this.GetComponentInChildren<Animator>();
+        _npcAnimator = transform.GetComponent<Animator>();
+        _npcAnimator.Play("Idle");
     }
 
     void Start()
     {
-        ObjectName = gameObject.name;
-        ObjectID = int.Parse((ObjectName.Split("_"))[1]);
+        ObjectID = this.npcID;
 
         AddQuestMarker();
         InitAnimator();

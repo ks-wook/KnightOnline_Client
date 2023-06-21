@@ -39,7 +39,7 @@ namespace Assets.Scripts.Controller
 
 
 
-            cinemachineFSM = GameObject.Find("CM StateDrivenCamera1").transform;
+            cinemachineFSM = GameObject.Find("CM StateDrivenCamera").transform;
             cinemachineAnimator = cinemachineFSM.GetComponent<Animator>();
 
             

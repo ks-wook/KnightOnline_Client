@@ -68,6 +68,7 @@ public class UI_Inventory_Item : UI_Base
 				Managers.Network.Send(equipPacket);
 
 
+
 				// 장비 착용 관련 퀘스트 확인
 				Managers.Quest.CheckEquipTypeQuest(ItemDbId);
 			}

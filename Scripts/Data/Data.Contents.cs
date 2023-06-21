@@ -6,7 +6,26 @@ using UnityEngine;
 
 namespace Data
 {
-	
+	#region Stat
+	[Serializable]
+	public class StatData : ILoader<int, StatInfo>
+	{
+		public List<StatInfo> stats = new List<StatInfo>();
+
+		public Dictionary<int, StatInfo> MakeDict()
+		{
+			Dictionary<int, StatInfo> dict = new Dictionary<int, StatInfo>();
+			foreach (StatInfo stat in stats)
+			{
+				stat.Hp = stat.MaxHp;
+				dict.Add(stat.Level, stat);
+			}
+			return dict;
+		}
+	}
+	#endregion
+
+
 	#region Skill
 	[Serializable]
 	public class Skill
@@ -34,6 +53,7 @@ namespace Data
 		}
 	}
 	#endregion
+
 
 	#region Item
 	[Serializable]
@@ -98,6 +118,7 @@ namespace Data
 	}
 	#endregion
 
+
 	#region BossMonster
 	[Serializable]
 	public class BossMonsterData
@@ -124,7 +145,6 @@ namespace Data
 		}
 	}
 	#endregion
-
 
 
 	#region Stage

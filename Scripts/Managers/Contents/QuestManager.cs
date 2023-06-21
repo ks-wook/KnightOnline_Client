@@ -235,7 +235,6 @@ public class QuestManager
     // TemplatedID를 통해 현재 플레이어의 퀘스트 정보 획득
     public Quest GetPlayerQuestById(int templatedId)
     {
-        Debug.Log(PlayerQuests.Values.ToList().ToString());
 
         Quest quest = new Quest();
         if(PlayerQuests.TryGetValue(templatedId, out quest))

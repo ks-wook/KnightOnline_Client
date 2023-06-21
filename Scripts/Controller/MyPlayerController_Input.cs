@@ -38,7 +38,7 @@ namespace Assets.Scripts.Controller
 
                 CamController.setCinemachineAnim("Conversation"); // 카메라 대화시점 전환
             }
-            else if (Input.GetKey(KeyCode.Q) && _inputable) // 원소 폭발(궁극기) 사용
+            else if (Input.GetKey(KeyCode.Q) && _inputable && currentScene == Define.Scene.Game) // 원소 폭발(궁극기) 사용
             {
                 // TEMP : 싱글 모드일때 연출 확인용
                 CamController.setCinemachineAnim("Ultimate"); // 카메라 대화시점 전환
@@ -61,7 +61,7 @@ namespace Assets.Scripts.Controller
 
 
             }
-            else if (Input.GetKey(KeyCode.E) && _inputable) // 원소 전투 스킬 사용
+            else if (Input.GetKey(KeyCode.E) && _inputable == true && currentScene == Define.Scene.Game) // 원소 전투 스킬 사용
             {
                 // TEMP : 싱글 모드일때 연출 확인용
                 playerAnimator.Play("Skill1");
@@ -78,8 +78,28 @@ namespace Assets.Scripts.Controller
 
 
             }
+            else if (Input.GetKey(KeyCode.P) && !isCoolTime) // 경험치 획득 테스트
+            {
+                StartCoroutine(getExp());
+                
 
 
+
+
+
+            }
+
+
+        }
+
+        // TEMP : 경험치 테스트
+        bool isCoolTime = false;
+        IEnumerator getExp()
+        {
+            isCoolTime = true;
+            GetExp(5);
+            yield return new WaitForSeconds(1f);
+            isCoolTime = false;
         }
 
 
@@ -123,6 +143,8 @@ namespace Assets.Scripts.Controller
 
         void CheckAttack()
         {
+            if (currentScene != Define.Scene.Game) // 게임씬 에서만 공격 가능
+                return;
 
             if ((_isMultiPlay == true) && (_coSkillCooltime == null) && Input.GetMouseButtonDown(0)) // 멀티 일때 공격 처리
             {
@@ -149,6 +171,16 @@ namespace Assets.Scripts.Controller
             {
                 StartCoroutine(CoAttack());
             }
+
+            // TODO : 원소 전투 및 원소 폭발 스킬에 대한 사용을 여기서 처리해야함
+
+
+
+
+
+
+
+
         }
 
         // 스킬 발동

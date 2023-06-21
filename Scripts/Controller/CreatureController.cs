@@ -5,11 +5,10 @@ using UnityEngine;
 
 public class CreatureController : MonoBehaviour
 {
-    public int Id { get; set; }
+    public int Id { get; set; } // 오브젝트의 ID
 
-    HPBar _hpBar;
 
-    // -------------- State ----------------
+    // ----------------- State 관련 변수, 함수 -------------------
     public enum CharacterState
     {
         Idle,
@@ -35,10 +34,10 @@ public class CreatureController : MonoBehaviour
     protected virtual void UpdateAttack() { }
     protected virtual void UpdateDead() { }
 
-    // --------------------------------------
+    // ---------------------------------------------------------
 
 
-    // ------------ Position ----------------
+    // ----------------------- Position ------------------------
     protected PositionInfo _positionInfo = new PositionInfo();
     public virtual PositionInfo PosInfo
     {
@@ -92,7 +91,11 @@ public class CreatureController : MonoBehaviour
         transform.position = DestPosition;
     }
 
-    // -------------- Stat ------------------
+    // ------------------- Stat 관련 ----------------------
+
+    HPBar _hpBar; // hp표시바 오브젝트
+
+
     StatInfo _stat = new StatInfo();
     public StatInfo Stat
     {
@@ -116,11 +119,6 @@ public class CreatureController : MonoBehaviour
         }
     }
 
-    // ------------------------------------
-
-
-
-    // -------------- HP ------------------
     protected void AddHpBar()
     {
         GameObject go = Managers.Resource.Instantiate("UI/WorldSpace/HpBar", transform);
@@ -140,27 +138,19 @@ public class CreatureController : MonoBehaviour
 
         _hpBar.SetHpRatio(ratio);
     }
-    // ------------------------------
+    // ----------------------------------------------------------
 
 
-    void Start()
-    {
 
-    }
-
-    void Update()
-    {
-        
-    }
+    // -------------------- override 전용 -----------------------
+    public JobSerializer creatureSerializer = new JobSerializer();
 
 
-    // ------------ override ---------------
     public virtual void MovePosition() { }
     public virtual void UseSkill() { }
-    protected virtual void Init()
-    {
-        AddHpBar(); // 크리쳐는 HP Bar 기본적으로 추가
-    }
+    protected virtual void Init() { AddHpBar(); } // 크리쳐는 HP Bar 기본적으로 추가
 
     public virtual void OnDead() { }
+    // ----------------------------------------------------------
+
 }
