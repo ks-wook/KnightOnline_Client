@@ -1,0 +1,87 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+public abstract class UI_Base : MonoBehaviour
+{
+	protected Dictionary<Type, UnityEngine.Object[]> _objects = new Dictionary<Type, UnityEngine.Object[]>();
+	public abstract void Init();
+
+	private void Awake()
+	{
+		Init();
+	}
+
+	// Enum 값의 이름을 이용하여 UI의 자식 객체들을 저장, 관리
+	protected void Bind<T>(Type type) where T : UnityEngine.Object
+	{
+		string[] names = Enum.GetNames(type);
+		UnityEngine.Object[] objects = new UnityEngine.Object[names.Length];
+		_objects.Add(typeof(T), objects);
+
+		for (int i = 0; i < names.Length; i++)
+		{
+			if (typeof(T) == typeof(GameObject))
+				objects[i] = Util.FindChild(gameObject, names[i], true);
+			else
+				objects[i] = Util.FindChild<T>(gameObject, names[i], true);
+
+			if (objects[i] == null)
+				Debug.Log($"Failed to bind({names[i]})");
+		}
+	}
+
+	// 순서대로 바인딩 -> Enum값의 index 이용해서 그대로 접근
+	protected T Get<T>(int idx) where T : UnityEngine.Object
+	{
+		UnityEngine.Object[] objects = null;
+		if (_objects.TryGetValue(typeof(T), out objects) == false)
+			return null;
+
+		return objects[idx] as T;
+	}
+
+	protected GameObject GetObject(int idx) { return Get<GameObject>(idx); }
+	protected Text GetText(int idx) { return Get<Text>(idx); }
+	protected Button GetButton(int idx) { return Get<Button>(idx); }
+	protected Image GetImage(int idx) { return Get<Image>(idx); }
+
+	// 클릭시 이름을 받지 않고 이벤트 바인딩
+	public static void BindEvent(GameObject go, Action<PointerEventData> action, Define.UIEvent type = Define.UIEvent.Click)
+	{
+		UI_EventHandler evt = Util.GetOrAddComponent<UI_EventHandler>(go);
+
+		switch (type)
+		{
+			case Define.UIEvent.Click:
+				evt.OnClickHandler -= action;
+				evt.OnClickHandler += action;
+				break;
+			case Define.UIEvent.Drag:
+				evt.OnDragHandler -= action;
+				evt.OnDragHandler += action;
+				break;
+		}
+	}
+
+	// 클릭시 UI 오브젝트의 이름을 알 수 있는 이벤트 바인딩
+	public static void BindEvent(GameObject go, Action<PointerEventData, string> action, Define.UIEvent type = Define.UIEvent.Click)
+	{
+		UI_EventHandler evt = Util.GetOrAddComponent<UI_EventHandler>(go);
+
+		switch (type)
+		{
+			case Define.UIEvent.Click:
+				evt.OnClickHandlerWithName -= action;
+				evt.OnClickHandlerWithName += action;
+				break;
+			case Define.UIEvent.Drag:
+				evt.OnDragHandlerWithName -= action;
+				evt.OnDragHandlerWithName += action;
+				break;
+		}
+	}
+}

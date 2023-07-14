@@ -1,0 +1,30 @@
+{
+  "stages": [
+    {
+      "stageName": "MainStage1_1",
+      "rewards": [
+        {
+          "id": "2",
+          "count": "1"
+        },
+        {
+          "id": "1",
+          "count": "1"
+        }
+      ]
+    },
+    {
+      "stageName": "MainStage1_2",
+      "rewards": [
+        {
+          "id": "2",
+          "count": "1"
+        },
+        {
+          "id": "2",
+          "count": "1"
+        }
+      ]
+    }
+  ]
+} 

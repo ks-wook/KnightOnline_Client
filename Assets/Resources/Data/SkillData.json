@@ -1,0 +1,25 @@
+{
+  "skills": [
+    {
+      "id": "1",
+      "name": "Knight_기본공격",
+      "cooldown": "0",
+      "damage": "1",
+      "skillType": "SkillNormal"
+    },
+    {
+      "id": "2",
+      "name": "Knight_전투스킬",
+      "cooldown": "6",
+      "damage": "1.5",
+      "skillType": "SkillBattle"
+    },
+    {
+      "id": "3",
+      "name": "Knight_궁극기",
+      "cooldown": "20",
+      "damage": "3",
+      "skillType": "SkillUltimate"
+    }
+  ]
+} 

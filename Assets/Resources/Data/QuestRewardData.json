@@ -1,0 +1,44 @@
+{
+  "questRewards": [
+    {
+      "QuestId": "1",
+      "rewards": [
+        {
+          "id": "1",
+          "count": "1"
+        }
+      ]
+    },
+    {
+      "QuestId": "2",
+      "rewards": [
+        {
+          "id": "2",
+          "count": "1"
+        },
+        {
+          "id": "2",
+          "count": "1"
+        }
+      ]
+    },
+    {
+      "QuestId": "3",
+      "rewards": [
+        {
+          "id": "2",
+          "count": "1"
+        }
+      ]
+    },
+    {
+      "QuestId": "4",
+      "rewards": [
+        {
+          "id": "2",
+          "count": "1"
+        }
+      ]
+    }
+  ]
+} 
