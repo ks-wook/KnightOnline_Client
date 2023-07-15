@@ -97,10 +97,7 @@ public class MonsterSpawner : InteractableObject
         }
     }
 
-    public override void UpdateTriggerState()
-    {
-        throw new System.NotImplementedException();
-    }
+
 
 
 

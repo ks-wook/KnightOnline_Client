@@ -19,29 +19,6 @@ public abstract class InteractableObject : MonoBehaviour
         Active,
     }
 
-    public enum TriggerState
-    {
-        Idle,
-        Enter,
-        Stay,
-        Battle, // Battle 상태는 몬스터 트리거의 경우 사용되는 상태
-        AggroLost, // 몬스터 트리거에서 어그로를 잃고 제자리로 돌아가야하는 상태
-        Exit
-    }
-
-    TriggerState triggerState = TriggerState.Idle;
-    public TriggerState TRIGGER_STATE
-    {
-        get { return triggerState;  }
-        set
-        {
-            if (triggerState == value)
-                return;
-
-            triggerState = value;
-        }
-    }
-
     public abstract void InterAct();
     
     protected virtual void OnTriggerEnter(Collider other) { }
@@ -54,6 +31,4 @@ public abstract class InteractableObject : MonoBehaviour
     // 상호작용 가능한 오브젝트에서 이벤트가 종료되었을 때 호출
     public virtual void OnEndConversation() { }
 
-    // 트리거 상태에 따른 업데이트 함수
-    public virtual void UpdateTriggerState() { }
 }

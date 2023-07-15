@@ -69,8 +69,9 @@ public class Managers : MonoBehaviour
             s_instance._pool.Init();
         }
     }
-
-    public static void Clear()
+    
+    // 씬 전환 시 초기화해야하는 것들을 초기화
+    public static void SceneChangeClear()
     {
         Object.Clear();
         Sound.Clear();

@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 public class UI_LevelUp : UI_Base
 {
+    [HideInInspector]
     public UI_Popup Popup;
 
     enum Texts

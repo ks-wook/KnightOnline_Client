@@ -14,7 +14,4 @@ public class UI_RewardPopup : UI_Popup
         RewardUI = GetComponentInChildren<UI_Reward>();
         RewardUI.Popup = this;
     }
-
-
-
 }
