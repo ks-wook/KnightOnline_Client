@@ -65,7 +65,6 @@ public class ObjectManager
 				pc.Id = info.ObjectId;
 				pc.PosInfo = info.PosInfo;
 				pc.STAT.MergeFrom(info.StatInfo);
-				pc.SetWeaponPrefab(info);
 				pc.SyncPos();
 
 				Debug.Log($"player id : {pc.Id} joined the game");

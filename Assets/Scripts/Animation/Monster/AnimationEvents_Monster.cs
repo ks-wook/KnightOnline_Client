@@ -13,7 +13,7 @@ public class AnimationEvents_Monster : MonoBehaviour
     Collider[] hitColliders; // 공격 시도 후 명중한 오브젝트
     MonsterController _monsterController;
     Animator _animator;
-    MonsterAI _monsterAI; // 몬스터의 시야에 따른 행동 트리거
+    MonsterAI _monsterAITrigger; // 몬스터의 시야에 따른 행동 트리거
     LayerMask _hittalbeMask;
 
 
@@ -37,7 +37,7 @@ public class AnimationEvents_Monster : MonoBehaviour
         }
 
         // 행동 횟수에 따른 궁극기 사용을 위해 트리거를 가져온다
-        _monsterAI = transform.GetComponentInChildren<MonsterAI>();
+        _monsterAITrigger = transform.GetComponentInChildren<MonsterAI>();
     }
 
 

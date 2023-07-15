@@ -259,7 +259,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4963143727372733189}
   - component: {fileID: 1941538444750051386}
-  - component: {fileID: 2484302773569984220}
   - component: {fileID: 4963143727372733186}
   - component: {fileID: 7066793267527535740}
   - component: {fileID: 2782586067434654152}
@@ -311,22 +310,6 @@ MonoBehaviour:
   DashEffectController: {fileID: 0}
   BattleSkillEffectController: {fileID: 0}
   UltimateSkillEffectController: {fileID: 0}
-  NomalAttackAnimCool: 0.5
-  BattleSkillAnimCool: 1.1
-  UltimateAnimCool: 5
---- !u!114 &2484302773569984220
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4963143727372733190}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8cc6cfbe058b124da80010497377eba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _myPlayerObject: {fileID: 0}
 --- !u!136 &4963143727372733186
 CapsuleCollider:
   m_ObjectHideFlags: 0

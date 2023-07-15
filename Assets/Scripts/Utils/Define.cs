@@ -8,6 +8,7 @@ public static class Define
     {
         Unknown,
         Login,
+        Loading,
         Lobby1,
         Game,
         RaidBoss,

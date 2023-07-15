@@ -243,8 +243,7 @@ public class NPCObject : InteractableObject
             
             if (playerQuest != null) // 퀘스트 완료에 대한 경험치 획득 요청
             {
-                Quest quest = Managers.Quest.GetQuestById(CurNPCQuestId);
-                Managers.Object.MyPlayer.GetExp(quest.Exp);
+                Managers.Object.MyPlayer.GetExp(playerQuest.Exp);
             }
 
             C_QuestChange questChange = new C_QuestChange();

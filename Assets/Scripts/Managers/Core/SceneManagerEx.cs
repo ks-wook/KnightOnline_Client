@@ -14,14 +14,14 @@ public class SceneManagerEx
     // 씬의 타입을 통해 씬을 로드하는 함수
     public void LoadScene(Define.Scene type)
     {
-        Managers.SceneChangeClear();
+        Managers.Clear();
         SceneManager.LoadScene(GetSceneName(type));
     }
 
     // 씬의 실제 이름을 통해 씬을 로드하는 함수
     public void LoadScene(string sceneName)
     {
-        Managers.SceneChangeClear();
+        Managers.Clear();
         SceneManager.LoadScene(sceneName);
     }
 

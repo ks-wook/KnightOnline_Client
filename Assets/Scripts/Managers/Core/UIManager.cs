@@ -8,7 +8,6 @@ public class UIManager
     int _order = 10;
 
     Stack<UI_Popup> _popupStack = new Stack<UI_Popup>();
-
     public UI_Scene SceneUI { get; private set; }
 
     public Define.Scene SceneType = Define.Scene.Unknown;
@@ -107,18 +106,6 @@ public class UIManager
 
         return popup;
     }
-
-    public bool ContainPopupUI<T>(string name = null) where T : UI_Popup
-    {
-        if(Root.transform.GetComponentInChildren<T>() != null)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-
 
     public void ClosePopupUI(UI_Popup popup)
     {

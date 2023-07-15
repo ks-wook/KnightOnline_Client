@@ -9,7 +9,7 @@ public class DialogueManager
     object _lock = new object();
 
     // 초기화를 위한 NPC 객체를 담는 Queue -> 게임 접속 시 비동기식으로 처리
-    Queue<(NPCObject npcObject, int scriptId)> _npcObjects = new Queue<(NPCObject npcObject, int scriptId)>();
+    Queue<(NPCObject npcTrigger, int scriptId)> _npcObjects = new Queue<(NPCObject npcTrigger, int scriptId)>();
 
     Dictionary<(int, int), (string[], int)> _dialoueDict = null;
 
@@ -67,12 +67,12 @@ public class DialogueManager
         // 대화 스크립트 초기화를 원하는 NPC가 있다면 처리
         while(_npcObjects.Count != 0)
         {
-            (NPCObject npcObject, int scriptId) nPCAndScriptId = _npcObjects.Dequeue();
-            NPCObject npc = nPCAndScriptId.npcObject;
-            int scriptId = nPCAndScriptId.scriptId;
+            (NPCObject npcTrigger, int scriptId) nPCTriggerAndScriptId = _npcObjects.Dequeue();
+            NPCObject npcTrigger = nPCTriggerAndScriptId.npcTrigger;
+            int scriptId = nPCTriggerAndScriptId.scriptId;
 
             // 퀘스트 매니저에게 초기화 등록을 요청해야 함
-            DialougeTask dialogueInitTask = new DialougeTask(npc.InitDialouge, GetDialogueAndQuest(npc.ObjectID, scriptId));
+            DialougeTask dialogueInitTask = new DialougeTask(npcTrigger.InitDialouge, GetDialogueAndQuest(npcTrigger.ObjectID, scriptId));
             Managers.Quest.NPCDialogueTaskRegister(dialogueInitTask);
         }
     }

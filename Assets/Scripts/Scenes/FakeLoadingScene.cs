@@ -2,11 +2,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-/*
- * 씬 전환 시 서버로부터 패킷을 받아서 게임 씬을 준비하기위한
- * 페이크 로딩 씬
- */
-
 public class FakeLoadingScene : MonoBehaviour
 {
     [SerializeField]
@@ -46,7 +41,7 @@ public class FakeLoadingScene : MonoBehaviour
         TipText.text = tips[randomNum];
 
 
-        Screen.SetResolution(960, 540, false);
+        Screen.SetResolution(800, 500, false);
         StartCoroutine(ViewFakeLoadingScene());
 
     }

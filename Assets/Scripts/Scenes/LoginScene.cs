@@ -24,8 +24,8 @@ public class LoginScene : BaseScene
 
         SceneType = Define.Scene.Login;
         Managers.UI.SCENETYPE = Define.Scene.Login;
-        
-        Screen.SetResolution(960, 540, false);
+
+        Screen.SetResolution(800, 500, false);
 
         _sceneUI = Managers.UI.ShowSceneUI<UI_LoginScene>();
 

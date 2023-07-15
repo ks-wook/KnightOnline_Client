@@ -85,9 +85,7 @@ namespace Assets.Scripts.Controller
             }
             else if (Input.GetKey(KeyCode.F) && _interactable) // InteractableObject 스크립트를 포함하는 오브젝트와 상호작용
             {
-                _interactable = false;
-
-                if (_InterActTarget != null)
+                if(_InterActTarget != null)
                 {
                     InteractableObject InterActor =
                         _InterActTarget.GetComponent<InteractableObject>();
@@ -100,6 +98,20 @@ namespace Assets.Scripts.Controller
                 StartCoroutine(getExp());
 
             }
+            else if(Input.GetKey(KeyCode.O)) // 스테이지 클리어 처리 테스트
+            {
+                // 스테이지 클리어 UI 출력
+                Managers.UI.ShowPopupUI<UI_StageClearPopup>();
+
+
+                // 스테이지 클리어 요청 패킷 전송
+                C_StageClear stageClear = new C_StageClear()
+                {
+                    StageName = Managers.Scene.GetCurrentSceneName(),
+                };
+
+                Managers.Network.Send(stageClear);
+            }
 
         }
 
@@ -107,7 +119,7 @@ namespace Assets.Scripts.Controller
         // 키보드 입력 시 UI 처리
         void GetUIKeyInput()
         {
-            if (Input.GetKeyDown(KeyCode.I)) // 인벤창
+            if (Input.GetKeyDown(KeyCode.I))
             {
                 if (Managers.UI.SCENETYPE == Define.Scene.Lobby1) // 현재 로비씬 일때만 인벤을 열 수 있다
                 {
@@ -119,7 +131,7 @@ namespace Assets.Scripts.Controller
                     {
                         // 카메라 TPS 시점 전환
                         _inputable = true;
-                        CinemachineController.STATE = 
+                        _cinemachineController.STATE = 
                             CinemachineController.CamState.TPS;
 
                         // 인벤토리 UI 비활성화
@@ -130,7 +142,7 @@ namespace Assets.Scripts.Controller
                     {
                         // 카메라 인벤토리시점 전환
                         _inputable = false;
-                        CinemachineController.STATE = 
+                        _cinemachineController.STATE = 
                             CinemachineController.CamState.Inven;
 
                         // 인벤토리 UI 활성화
@@ -139,18 +151,6 @@ namespace Assets.Scripts.Controller
                         invenUI.RefreshUI();
                         statUI.RefreshUI();
                     }
-                }
-
-            }
-            else if(Input.GetKeyDown(KeyCode.Escape)) // 설정창
-            {
-                if(Managers.UI.ContainPopupUI<UI_SettingsPopup>() == false)
-                {
-                    // 설정창 UI 활성화
-                    Managers.UI.ShowPopupUI<UI_SettingsPopup>();
-
-                    CinemachineController.STATE = 
-                        CinemachineController.CamState.Settings;
                 }
 
             }
@@ -298,7 +298,7 @@ namespace Assets.Scripts.Controller
                 Debug.Log("궁극기 실행");
 
                 // 카메라 궁극기 연출 시점 전환
-                CinemachineController.STATE = 
+                _cinemachineController.STATE = 
                     CinemachineController.CamState.Ultimate;
                 UltimateBackGround.gameObject.SetActive(true);
 

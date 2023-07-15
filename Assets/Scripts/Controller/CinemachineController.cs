@@ -20,7 +20,6 @@ namespace Assets.Scripts.Controller
         // ------------------------ Cinemachine Virtual Cams -----------------------
         private Transform TPSCam;
         private Transform InvenCam;
-        private Transform SettingsCam;
         private Transform ConversationCam;
         private Transform UltimateCam;
         private Transform TransferCam;
@@ -28,7 +27,6 @@ namespace Assets.Scripts.Controller
         private Transform cinemachineFSM;
         private CinemachineVirtualCamera _followCam;
         private CinemachineVirtualCamera _invenCam;
-        private CinemachineVirtualCamera _settingsCam;
         private CinemachineVirtualCamera _conversationCam;
         private CinemachineVirtualCamera _ultimateCam;
         private CinemachineVirtualCamera _transferCam;
@@ -58,7 +56,6 @@ namespace Assets.Scripts.Controller
             None,
             TPS,
             Inven,
-            Settings,
             Conversation,
             Ultimate,
             Transfer,
@@ -100,9 +97,6 @@ namespace Assets.Scripts.Controller
             InvenCam = GameObject.Find("CM Inven").transform;
             _invenCam = InvenCam.GetComponent<CinemachineVirtualCamera>();
 
-            SettingsCam = GameObject.Find("CM Settings").transform;
-            _settingsCam = SettingsCam.GetComponent<CinemachineVirtualCamera>();
-
             ConversationCam = GameObject.Find("CM Conversation").transform;
             _conversationCam = ConversationCam.GetComponent<CinemachineVirtualCamera>();
 
@@ -125,8 +119,6 @@ namespace Assets.Scripts.Controller
             _followCam.Follow = player;
             _invenCam.LookAt = player;
             _invenCam.Follow = player;
-            _settingsCam.LookAt = player;
-            _settingsCam.Follow = player;
             _conversationCam.Follow = player;
             _conversationCam.LookAt = player;
             _ultimateCam.Follow = player.Find("UltimateCamCenter");
@@ -164,9 +156,7 @@ namespace Assets.Scripts.Controller
         {
             Debug.Log("카메라 흔들림");
             if(screenShake == null)
-            {
-                screenShake = Managers.Object.MyPlayer.GetComponent<CinemachineImpulseSource>();
-            }
+                screenShake = GameObject.FindWithTag("Player").GetComponent<CinemachineImpulseSource>();
 
             screenShake.GenerateImpulse();
         }
