@@ -37,15 +37,31 @@ public class PlayerController : CreatureController
     [HideInInspector]
     public ParticleSystem UltimateSkillEffectController; // 궁극기 이펙트
 
-    Transform _handGrip = null; // 손에 쥔 무기 프리팹
-    Transform _backGrip = null; // 등에 멘 무기 프리팹
 
-    Transform _lastWeapon = null; // 마지막에 장착하고 있던 무기
 
     // 애니메이션 재생시간동안에 의한 애니메이션 재생 쿨타임
-    WaitForSeconds nomalAttackCool = new WaitForSeconds(0.3f);
-    WaitForSeconds battleSkillCool = new WaitForSeconds(1.1f);
-    WaitForSeconds UltimateCool = new WaitForSeconds(6f);
+    [SerializeField]
+    [Tooltip("기본 공격에 대한 애니메이션 재생동안 경직되는 시간")]
+    float NomalAttackAnimCool = 0.5f;
+
+    [SerializeField]
+    [Tooltip("전투 스킬에 대한 애니메이션 재생동안 경직되는 시간")]
+    float BattleSkillAnimCool = 1.1f;
+
+    [SerializeField]
+    [Tooltip("기본 공격에 대한 애니메이션 재생동안 경직되는 시간")]
+    float UltimateAnimCool = 5.0f;
+
+    // 애니메이션 재생시간동안에 의한 애니메이션 재생 쿨타임
+    WaitForSeconds _nomalAttackAnimCool;
+    WaitForSeconds _battleSkillAnimCool;
+    WaitForSeconds _ultimateAnimCool;
+
+
+
+    Transform _handGrip = null; // 손에 쥔 무기 프리팹
+    Transform _backGrip = null; // 등에 멘 무기 프리팹
+    Transform _lastWeapon = null; // 마지막에 장착하고 있던 무기
 
     // ----------------------------------------------------------------------
 
@@ -55,10 +71,22 @@ public class PlayerController : CreatureController
     protected override void Init()
     {
         base.Init();
-        InitAnimAndParticlesys();
+        InitAnimation();
+        InitParticlesys();
     }
 
-    private void InitAnimAndParticlesys() // 애니메이터 및 이펙트를 위한 파티클 시스템 획득
+    private void InitAnimation()
+    {
+        // 애니메이터 획득
+        PlayerAnimator = transform.GetComponent<Animator>();
+
+        // 애니메이션 재생동안 이동이 불가능한 시간 설정
+        _nomalAttackAnimCool = new WaitForSeconds(NomalAttackAnimCool);
+        _battleSkillAnimCool = new WaitForSeconds(BattleSkillAnimCool);
+        _ultimateAnimCool = new WaitForSeconds(UltimateAnimCool);
+    }
+
+    private void InitParticlesys() // 애니메이터 및 이펙트를 위한 파티클 시스템 획득
     {
         _handGrip = transform.GetChild(0)
             .Find("Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/HandGrip");
@@ -70,7 +98,6 @@ public class PlayerController : CreatureController
         // 무기가 등에 장착되는 그립
         _backGrip = transform.GetChild(0)
             .Find("Root/Hips/Spine_01/Spine_02/BackGrip");
-
 
         // 대쉬 이펙트 획득
         if (DashEffectController == null)
@@ -91,6 +118,22 @@ public class PlayerController : CreatureController
             UltimateSkillEffectController =
                 transform.Find("UltimateSkillEffect").GetComponent<ParticleSystem>();
         }
+    }
+
+    public void SetWeaponPrefab(ObjectInfo info)
+    {
+        // info 에 담긴 정보대로 아이템 프리팹 활성화
+        Debug.Log("현재 장착중인 무기 ID : " + info.EquippedItemTemplatedId);
+
+        if(_handGrip == null)
+        {
+            _handGrip = transform.GetChild(0)
+                .Find("Root/Hips/Spine_01/Spine_02/Spine_03/Clavicle_R/Shoulder_R/Elbow_R/Hand_R/HandGrip");
+
+        }
+
+        _lastWeapon = _handGrip.Find("Weapon_Prefab_" + info.EquippedItemTemplatedId);
+        _lastWeapon.gameObject.SetActive(true);
     }
 
     // ----------------------------------------------------------------------
@@ -235,7 +278,7 @@ public class PlayerController : CreatureController
             SlashEffectController.Play();
             PlayerAnimator.SetFloat("normalAttack", 1);
 
-            yield return nomalAttackCool;
+            yield return _nomalAttackAnimCool;
 
             SlashEffectController.Stop();
             PlayerAnimator.SetFloat("normalAttack", 0);
@@ -248,7 +291,7 @@ public class PlayerController : CreatureController
             PlayerAnimator.Play("BattleSkill");
             BattleSkillEffectController.gameObject.SetActive(true);
 
-            yield return battleSkillCool;
+            yield return _battleSkillAnimCool;
 
             STATE = CharacterState.Idle;
         }
@@ -258,7 +301,7 @@ public class PlayerController : CreatureController
 
             PlayerAnimator.Play("Ultimate");
 
-            yield return UltimateCool;
+            yield return _ultimateAnimCool;
 
             STATE = CharacterState.Idle;
         }

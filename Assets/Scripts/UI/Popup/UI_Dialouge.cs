@@ -7,6 +7,13 @@ using UnityEngine.UI;
 
 public class UI_Dialouge : UI_Base
 {
+    [SerializeField]
+    [Tooltip("대화 텍스트 속도")]
+    float TextSpeed = 0.005f;
+
+    [HideInInspector]
+    Coroutine DialogueCoroutine;
+
     [HideInInspector]
     public string _npcName = "NPC";
     public string NPCName
@@ -29,20 +36,13 @@ public class UI_Dialouge : UI_Base
     enum Texts
     {
         DialogueText,
-        Select1Text,
-        Select2Text,
         NameText
     }
 
     enum Images
     {
         DialougeBackground,
-        Select1Btn,
-        Select2Btn
     }
-
-    GameObject select1Btn;
-    GameObject select2Btn;
 
     public override void Init()
     {
@@ -50,15 +50,6 @@ public class UI_Dialouge : UI_Base
         Bind<Text>(typeof(Texts));
 
         GetText((int)Texts.DialogueText).gameObject.BindEvent(OnDialougeBackgroundClick);
-
-
-        select1Btn = GetImage((int)Texts.Select1Text).gameObject;
-        select1Btn.BindEvent(OnSelect1BtnClick);
-        select1Btn.SetActive(false);
-
-        select2Btn = GetImage((int)Texts.Select2Text).gameObject;
-        select2Btn.BindEvent(OnSelect1BtnClick);
-        select2Btn.SetActive(false);
     }
 
     // 스크립트 진행 처리
@@ -66,7 +57,12 @@ public class UI_Dialouge : UI_Base
     {
         if (NPCdialouge.Length > _dialougeIdx) // 뒤에 대사가 더 있는 경우
         {
-            GetText((int)Texts.DialogueText).text = NPCdialouge[_dialougeIdx++];
+            if(DialogueCoroutine == null)
+            {
+                GetText((int)Texts.DialogueText).text = "";
+                DialogueCoroutine = StartCoroutine("TypeLine", NPCdialouge[_dialougeIdx++]);
+            }
+
         }
         else // 대사가 끝난 경우
         {
@@ -78,6 +74,19 @@ public class UI_Dialouge : UI_Base
         }
     }
 
+    IEnumerator TypeLine(string script)
+    {
+        Text dialogueText = GetText((int)Texts.DialogueText);
+
+        foreach (char c in script.ToCharArray())
+        {
+            dialogueText.text += c;
+            yield return new WaitForSeconds(TextSpeed);
+        }
+
+        DialogueCoroutine = null;
+    }
+
     // Dialogue UI 클릭 시 이벤트
     public void OnDialougeBackgroundClick(PointerEventData evt)
     {
@@ -85,16 +94,5 @@ public class UI_Dialouge : UI_Base
             return;
 
         ConversationProceed();
-    }
-
-
-    public void OnSelect1BtnClick(PointerEventData evt)
-    {
-        // TODO
-    }
-
-    public void OnSelect2BtnClick(PointerEventData evt)
-    {
-        // TODO
     }
 }

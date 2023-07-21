@@ -4,7 +4,7 @@
       "id": "1",
       "name": "견습생의 검",
       "weaponType": "Sword",
-      "damage": "1000",
+      "damage": "500",
       "tip": "무겁고 낡은 검이다.",
       "iconPath": "Textures/Item/Weapon/Weapon_Prefab_1"
     },
@@ -12,7 +12,7 @@
       "id": "2",
       "name": "정예병의 검",
       "weaponType": "Sword",
-      "damage": "1500",
+      "damage": "700",
       "tip": "정예병들을 위해 생산된 보급형 검이다.",
       "iconPath": "Textures/Item/Weapon/Weapon_Prefab_2"
     }

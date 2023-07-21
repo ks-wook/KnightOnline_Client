@@ -53548,7 +53548,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8083713318303313137, guid: 6712ec6a7445e06498342605daecc937, type: 3}
       propertyPath: GimmicConditionCount
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8549344434397915839, guid: 6712ec6a7445e06498342605daecc937, type: 3}
       propertyPath: m_RootOrder

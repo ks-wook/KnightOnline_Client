@@ -60,7 +60,7 @@ public class SoundManager
             }
 
             AudioSource audioSource = _audioSources[(int)Define.Sound.Bgm];
-
+            
             if (audioSource.isPlaying) // 재생 중인 오디오 리소스가 있었던 경우 재생을 중단
                 audioSource.Stop();
 
@@ -107,6 +107,13 @@ public class SoundManager
         }
 
         return audioClip;
+    }
+
+    // 볼륨 조절 처리
+    public void ChangeVolume(Define.Sound type, float volume)
+    {
+        AudioSource audioSource = _audioSources[(int)type];
+        audioSource.volume = volume;
     }
 
 

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6972538292809775440}
   - component: {fileID: 8513146614201694134}
   m_Layer: 0
-  m_Name: AITrigger
+  m_Name: MonsterAI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -50,7 +50,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 953372322720145160}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -178,6 +178,7 @@ MonoBehaviour:
   ReturnBaseRange: 8
   HasSuerArmor: 1
   HpBarHeight: 4
+  SpeedFactor: -4
   MonsterSkillSets:
   - SkillRange: 1.3
     SkillDelay: 3

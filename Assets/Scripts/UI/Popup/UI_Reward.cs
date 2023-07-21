@@ -6,7 +6,9 @@ using UnityEngine.UI;
 
 public class UI_Reward : UI_Base
 {
+    [HideInInspector]
     public UI_Popup Popup;
+
     enum Images
     {
         Background,

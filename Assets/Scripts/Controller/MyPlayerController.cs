@@ -21,7 +21,8 @@ namespace Assets.Scripts.Controller
         private Transform Player;
 
         // ------------------- Cinemahcine Update 관련 변수 ---------------------
-        CinemachineController _cinemachineController;
+        [HideInInspector]
+        public CinemachineController CinemachineController;
         
         // ----------------------------------------------------------------------
 
@@ -65,13 +66,6 @@ namespace Assets.Scripts.Controller
         [HideInInspector]
         public Transform UltimateBackGround; // 궁극기 연출용 배경
 
-
-
-        bool _updated = false; // 서버상태 업데이트 여부 1. STATE가 바뀌거나 2. 위치가 바뀌거나
-        bool _interactable = false; // 상호작용 가능 여부
-        bool _inputable = true; // 키 입력 가능 여부
-
-
         [HideInInspector]
         public bool EnableUltimate = false; // 궁극기 사용 가능 여부
         const int UltimateCount = 6; // 궁극기를 사용하기 위해 필요한 스택
@@ -114,14 +108,20 @@ namespace Assets.Scripts.Controller
         public bool _isMultiPlay = false; // 기본으로 싱글 플레이로 설정
 
         [HideInInspector]
-        public Define.Scene currentScene; // 현재 씬 타입
+        private Define.Scene currentScene; // 현재 씬 타입 캐싱
+
+
+
+        bool _updated = false; // 서버상태 업데이트 여부 1. STATE가 바뀌거나 2. 위치가 바뀌거나
+        bool _interactable = false; // 상호작용 가능 여부
+        bool _inputable = true; // 키 입력 가능 여부
 
 
         Transform _handGrip = null; // 손에 쥔 무기 프리팹
         Transform _backGrip = null; // 등에 멘 무기 프리팹
-
         Transform _lastWeapon = null; // 마지막에 장착하고 있던 무기의 프리팹
         public int LastWeaponTemplatedId = 0; // 마지막에 장착하고 있던 무기의 도감 넘버
+        
         // ----------------------------------------------------------------------
 
 
@@ -148,6 +148,10 @@ namespace Assets.Scripts.Controller
                     _isMultiPlay = true;
                 }
             }
+
+            HPBar hpBar = transform.GetComponentInChildren<HPBar>();
+            if (hpBar != null)
+                hpBar.gameObject.SetActive(false);
 
             // 처음 시작 시 최대 Hp 부터 시작
             HP = STAT.MaxHp;
@@ -208,10 +212,10 @@ namespace Assets.Scripts.Controller
             
             if (cc != null)
             {
-                _cinemachineController = cc.GetComponent<CinemachineController>();
+                CinemachineController = cc.GetComponent<CinemachineController>();
 
-                _cinemachineController.InitTarget(transform);
-                _cinemachineController.STATE = CinemachineController.CamState.TPS;
+                CinemachineController.InitTarget(transform);
+                CinemachineController.STATE = CinemachineController.CamState.TPS;
             }
 
         }
@@ -339,8 +343,7 @@ namespace Assets.Scripts.Controller
                     return;
 
                 _positionInfo = value;
-                // 이동 처리
-                // TODO
+
             }
         }
 
@@ -368,7 +371,7 @@ namespace Assets.Scripts.Controller
                 var forward = Camera.main.transform.TransformDirection(Vector3.forward);
                 forward.y = 0;
 
-                //get the right-facing direction of the referenceTransform
+                // get the right-facing direction of the referenceTransform
                 var right = Camera.main.transform.TransformDirection(Vector3.right);
 
                 // determine the direction the player will face based on input and the referenceTransform's right and forward directions
@@ -380,7 +383,7 @@ namespace Assets.Scripts.Controller
                 var forward = transform.TransformDirection(Vector3.forward);
                 forward.y = 0;
 
-                //get the right-facing direction of the referenceTransform
+                // get the right-facing direction of the referenceTransform
                 var right = transform.TransformDirection(Vector3.right);
                 targetDirection = input.x * right + Mathf.Abs(input.y) * forward;
             }
@@ -423,8 +426,6 @@ namespace Assets.Scripts.Controller
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(euler), turnSpeed * turnSpeedMultiplier * Time.deltaTime);
                 transform.position += transform.forward * Time.deltaTime * 5.0f;
 
-                // 위치 갱신은 플레이어 이동에 의해서만 생기는 것이 아님
-                // DestPosition = transform.position;
                 ForwardDir = transform.forward;
             }
             else
@@ -631,7 +632,7 @@ namespace Assets.Scripts.Controller
             STAT.Level = levelUpPacket.NewLevel;
             STAT.TotalExp = levelUpPacket.TotalExp;
             STAT.MaxHp = newStat.MaxHp;
-            STAT.Hp = newStat.MaxHp;
+            HP = newStat.MaxHp;
             STAT.Attack = newStat.Attack;
         }
 

@@ -89,7 +89,7 @@ public class MonsterSpawner : InteractableObject
     }
 
     // 플레이어 접근 시 소환
-    protected override void OnTriggerEnter(Collider other) 
+    private void OnTriggerEnter(Collider other) 
     { 
         if(other.gameObject.CompareTag("Player"))
         {
@@ -97,10 +97,7 @@ public class MonsterSpawner : InteractableObject
         }
     }
 
-    public override void UpdateTriggerState()
-    {
-        throw new System.NotImplementedException();
-    }
+
 
 
 

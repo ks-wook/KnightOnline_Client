@@ -242,7 +242,7 @@ public class QuestManager
                 IsAddedPlayerQuests = true;
         }
         
-        FlushQuestDialogueTaskQueue();
+        FlushQuestDialogueQueue();
 
     }
     // -------------------------------------------------------------------------
@@ -371,10 +371,12 @@ public class QuestManager
         }
 
         // UI 갱신
-        UI_LobbyScene lobbySceneUI = Managers.UI.SceneUI as UI_LobbyScene;
-        UI_Quest questUI = lobbySceneUI.QuestUI;
-        questUI.RefreshUI();
-
+        if(Managers.Scene.CurrentScene.SceneType == Define.Scene.Lobby1)
+        {
+            UI_LobbyScene lobbySceneUI = Managers.UI.SceneUI as UI_LobbyScene;
+            UI_Quest questUI = lobbySceneUI.QuestUI;
+            questUI.RefreshUI();
+        }
     }
 
     // -------------------------------------------------------------
@@ -390,17 +392,16 @@ public class QuestManager
 
     Queue<DialougeTask> _questDialogueTasks = new Queue<DialougeTask>();
 
-    public void NPCDialogueTaskRegister(DialougeTask dialougeTask)
+    public void QuestDialogueRegister(DialougeTask dialougeTask)
     {
         lock (_lock)
         {
             _questDialogueTasks.Enqueue(dialougeTask);
-            FlushQuestDialogueTaskQueue();
-            
+            FlushQuestDialogueQueue();
         }
     }
 
-    public void FlushQuestDialogueTaskQueue()
+    public void FlushQuestDialogueQueue()
     {
         if (IsRecievedPlayerQuestsByServer && IsAddedPlayerQuests) // 퀘스트 정보를 서버로 부터 받아 초기화 했다면
         {

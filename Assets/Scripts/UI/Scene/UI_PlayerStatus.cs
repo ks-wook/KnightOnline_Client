@@ -22,30 +22,18 @@ public class UI_PlayerStatus : UI_Base
     BattleSkillTimer BattleSkillTimer;
 
 
-    Text _hpText;
 
-    enum Images
-    {
-        
-    }
-
-    enum Texts
-    {
-        HpText,
-    }
+  
 
     public override void Init()
     {
-        Bind<Text>(typeof(Texts));
 
-        _hpText = GetText((int)Texts.HpText);
     }
 
 
     // Hp 게이지 갱신
     public void SetHpSlider(int MaxHp, int Hp)
     {
-        _hpText.text = Hp + " / " + MaxHp;
 
         float ratio = (float) Hp / MaxHp;
         if (HpSlider != null)

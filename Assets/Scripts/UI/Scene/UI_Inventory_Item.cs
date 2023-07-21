@@ -47,7 +47,6 @@ public class UI_Inventory_Item : UI_Base
 				if (Managers.UI.SceneType == Define.Scene.Lobby1)
 				{
 					UI_LobbyScene lobbyScene = Managers.UI.SceneUI as UI_LobbyScene;
-					Debug.Log(itemData.tip + itemData.name);
 					lobbyScene.InvenUI.SetItemData(itemData.name, itemData.tip);
 				}
 				else if (Managers.UI.SceneType == Define.Scene.Game)

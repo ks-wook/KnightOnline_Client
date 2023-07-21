@@ -217,7 +217,7 @@ public class NPCObject : InteractableObject
     }
 
     // 대화 종료(스크립트의 마지막에서 호출)
-    public override void OnEndConversation()
+    public void OnEndConversation()
     {
         _cinemachineController.STATE = 
             CinemachineController.CamState.TPS;
@@ -243,7 +243,8 @@ public class NPCObject : InteractableObject
             
             if (playerQuest != null) // 퀘스트 완료에 대한 경험치 획득 요청
             {
-                Managers.Object.MyPlayer.GetExp(playerQuest.Exp);
+                Quest quest = Managers.Quest.GetQuestById(CurNPCQuestId);
+                Managers.Object.MyPlayer.GetExp(quest.Exp);
             }
 
             C_QuestChange questChange = new C_QuestChange();

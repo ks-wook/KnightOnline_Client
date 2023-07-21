@@ -19,21 +19,21 @@
       "maxHp": "2000",
       "attack": "30",
       "speed": "5.0",
-      "totalExp": "20"
+      "totalExp": "30"
     },
     {
       "level": "4",
       "maxHp": "2500",
       "attack": "35",
       "speed": "5.0",
-      "totalExp": "40"
+      "totalExp": "60"
     },
     {
       "level": "5",
       "maxHp": "3000",
       "attack": "40",
       "speed": "5.0",
-      "totalExp": "80"
+      "totalExp": "100"
     }
   ]
 } 

@@ -81,7 +81,9 @@ public class MonsterController : CreatureController
     [Tooltip("hp 바 위치")]
     public float HpBarHeight = 1.0f;
 
-
+    [SerializeField]
+    [Tooltip("이동속도 보정 값")]
+    public float SpeedFactor = -4;
 
 
 
@@ -115,6 +117,7 @@ public class MonsterController : CreatureController
         [SerializeField]
         [Tooltip("스킬 이펙트")]
         public ParticleSystem SkillEffect;
+
     }
 
     // 코루틴 반환 값 캐싱
@@ -143,7 +146,7 @@ public class MonsterController : CreatureController
 
     // ---------------------- Target 관련 변수 --------------------------
     private MyPlayerController _targetPlayer;
-    private MonsterAI _monsterAITrigger;
+    private MonsterAI _monsterAI;
     public Vector3 BasePosition = new Vector3(0, 0, 0);
 
     LayerMask _hittalbeMask;
@@ -202,9 +205,8 @@ public class MonsterController : CreatureController
             // 기본적으로 자신의 위치를 Base (어그로 풀릴 시 돌아오는 위치) 로 지정
             BasePosition = transform.position;
 
-            // 트리거 컴포넌트 획득
-            _monsterAITrigger = transform.Find("AITrigger").gameObject.
-                GetOrAddComponent<MonsterAI>();
+            // AI 컴포넌트 획득
+            _monsterAI = transform.GetComponentInChildren<MonsterAI>();
         }
     }
 
@@ -307,31 +309,25 @@ public class MonsterController : CreatureController
                 break;
         }
 
-        // TODO : 레이드 보스는 네트워크 업데이트 필요
-        // PosInfo.State = (CreateureState)STATE;
-        // CheckUpdatedFlag();
-
     }
 
     // 이동 처리 함수
     void MovePosition()
     {
-        if (Animator.GetFloat("speed") == 0)
+        if (Animator.GetFloat("speed") == 0) // 애니메이터와 이동 상태 동기화 (이동 애니메이션 재생중이 아닐 때는 이동 금지)
             return;
 
-        if (_monsterAITrigger.Target == null) // 타겟 없는 경우 스폰(베이스) 지점으로 이동
-        {
+        if (_monsterAI.Target == null) // 타겟 없는 경우 스폰(베이스) 지점으로 이동
             pathVector = BasePosition;
-
-        }
         else // 타켓이 있는 경우 타겟의 위치를 추적
-        {
-            pathVector = _monsterAITrigger.Target.transform.position;
-        }
+            pathVector = _monsterAI.Target.transform.position;
+        
 
+        if (STAT.Speed + SpeedFactor > 0)
+            monsterNma.speed = STAT.Speed + SpeedFactor; // 기본 스탯 + 스피드 보정 값
+        else
+            monsterNma.speed = 0;
 
-        // TEMP : 스피드는 스탯 데이터에서 가져와야함
-        monsterNma.speed = 1.0f; // 임시로 고정값 할당
         monsterNma.CalculatePath(pathVector, pathToTarget);
         monsterNma.SetPath(pathToTarget); // 계산된 경로로 이동
 
@@ -407,8 +403,8 @@ public class MonsterController : CreatureController
     {
         Inputable = false;
 
-        if(_monsterAITrigger != null)
-            _monsterAITrigger.gameObject.SetActive(false);
+        if(_monsterAI != null)
+            _monsterAI.gameObject.SetActive(false);
 
         if(!isRaidBoss)
         {
@@ -575,6 +571,14 @@ public class MonsterController : CreatureController
 
             // 현재 스테이지와 관련하여 퀘스트가 있다면 클리어 처리
             Managers.Quest.CheckClearTypeQuest(stageClear.StageName);
+
+            string currentStagename = Managers.Scene.GetCurrentSceneName();
+
+            // 클리어한 스테이지 데이터에 추가
+            if(!Managers.Object.ClearedStages.Contains(currentStagename))
+            {
+                Managers.Object.ClearedStages.Add(currentStagename);
+            }
 
         }
 

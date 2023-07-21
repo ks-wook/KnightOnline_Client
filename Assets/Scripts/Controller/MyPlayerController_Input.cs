@@ -85,7 +85,9 @@ namespace Assets.Scripts.Controller
             }
             else if (Input.GetKey(KeyCode.F) && _interactable) // InteractableObject 스크립트를 포함하는 오브젝트와 상호작용
             {
-                if(_InterActTarget != null)
+                _interactable = false;
+
+                if (_InterActTarget != null)
                 {
                     InteractableObject InterActor =
                         _InterActTarget.GetComponent<InteractableObject>();
@@ -93,33 +95,24 @@ namespace Assets.Scripts.Controller
                     InterActor.InterAct();
                 }
             }
-            else if (Input.GetKey(KeyCode.P) && !isCoolTime) // 경험치 획득 테스트
+            else if (Input.GetKey(KeyCode.LeftAlt) && !isCoolTime) // 마우스 커서 표시
             {
-                StartCoroutine(getExp());
-
+                StartCoroutine(CursorOn());
             }
-            else if(Input.GetKey(KeyCode.O)) // 스테이지 클리어 처리 테스트
+            else if (Input.GetKey(KeyCode.P) && !isCoolTime) // 마우스 커서 표시
             {
-                // 스테이지 클리어 UI 출력
-                Managers.UI.ShowPopupUI<UI_StageClearPopup>();
-
-
-                // 스테이지 클리어 요청 패킷 전송
-                C_StageClear stageClear = new C_StageClear()
-                {
-                    StageName = Managers.Scene.GetCurrentSceneName(),
-                };
-
-                Managers.Network.Send(stageClear);
+                StartCoroutine(test());
             }
 
+
+            
         }
 
         
         // 키보드 입력 시 UI 처리
         void GetUIKeyInput()
         {
-            if (Input.GetKeyDown(KeyCode.I))
+            if (Input.GetKeyDown(KeyCode.I)) // 인벤창
             {
                 if (Managers.UI.SCENETYPE == Define.Scene.Lobby1) // 현재 로비씬 일때만 인벤을 열 수 있다
                 {
@@ -131,7 +124,7 @@ namespace Assets.Scripts.Controller
                     {
                         // 카메라 TPS 시점 전환
                         _inputable = true;
-                        _cinemachineController.STATE = 
+                        CinemachineController.STATE = 
                             CinemachineController.CamState.TPS;
 
                         // 인벤토리 UI 비활성화
@@ -142,7 +135,7 @@ namespace Assets.Scripts.Controller
                     {
                         // 카메라 인벤토리시점 전환
                         _inputable = false;
-                        _cinemachineController.STATE = 
+                        CinemachineController.STATE = 
                             CinemachineController.CamState.Inven;
 
                         // 인벤토리 UI 활성화
@@ -151,6 +144,18 @@ namespace Assets.Scripts.Controller
                         invenUI.RefreshUI();
                         statUI.RefreshUI();
                     }
+                }
+
+            }
+            else if(Input.GetKeyDown(KeyCode.Escape)) // 설정창
+            {
+                if(Managers.UI.ContainPopupUI<UI_SettingsPopup>() == false)
+                {
+                    // 설정창 UI 활성화
+                    Managers.UI.ShowPopupUI<UI_SettingsPopup>();
+
+                    CinemachineController.STATE = 
+                        CinemachineController.CamState.Settings;
                 }
 
             }
@@ -298,7 +303,7 @@ namespace Assets.Scripts.Controller
                 Debug.Log("궁극기 실행");
 
                 // 카메라 궁극기 연출 시점 전환
-                _cinemachineController.STATE = 
+                CinemachineController.STATE = 
                     CinemachineController.CamState.Ultimate;
                 UltimateBackGround.gameObject.SetActive(true);
 
@@ -458,11 +463,37 @@ namespace Assets.Scripts.Controller
 
         // TEMP : 경험치 테스트
         bool isCoolTime = false;
-        IEnumerator getExp()
+        IEnumerator CursorOn()
         {
             isCoolTime = true;
-            GetExp(5);
+            if (Cursor.lockState == CursorLockMode.Confined)
+            {
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+                CinemachineController.STATE = CinemachineController.CamState.Settings;
+            }
+            else
+            {
+                CinemachineController.STATE = CinemachineController.CamState.TPS;
+            }
             yield return new WaitForSeconds(1f);
+            isCoolTime = false;
+
+            
+        }
+
+        int quest = 1;
+        IEnumerator test()
+        {
+            isCoolTime = true;
+
+            C_QuestChange questChange = new C_QuestChange();
+            questChange.QuestTemplatedId = quest++;
+            questChange.IsCleared = true;
+            questChange.IsRewarded = true; // 보상 획득 처리 요청
+            Managers.Network.Send(questChange);
+            yield return new WaitForSeconds(1f);
+
             isCoolTime = false;
         }
     }

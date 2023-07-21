@@ -1,7 +1,5 @@
-using Assets.Scripts.Controller;
 using Google.Protobuf.Protocol;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -79,20 +77,12 @@ public class PortalObject : InteractableObject
         Managers.Network.Send(enterLobbyPacket);
     }
 
-    /*void ReturnToLobby()
-    {
-        // 로비로 이동
-        Managers.Scene.LoadScene(Define.Scene.Lobby1);
-
-        C_EnterLobby enterLobbyPacket = new C_EnterLobby();
-        enterLobbyPacket.Name = PacketHandler.PlayerName;
-        enterLobbyPacket.IsGameToLobby = true;
-        Managers.Network.Send(enterLobbyPacket);
-    }*/
-
     IEnumerator CoAdventureUIOn()
     {
         yield return new WaitForSeconds(2f);
+
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
 
         // 던전 선택 UI ON
         if (Managers.UI.SCENETYPE == Define.Scene.Lobby1)
@@ -115,6 +105,8 @@ public class PortalObject : InteractableObject
     }
 
     // ----------------------------------------------------------------
+
+
 
 
 
