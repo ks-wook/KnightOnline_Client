@@ -99,10 +99,6 @@ namespace Assets.Scripts.Controller
             {
                 StartCoroutine(CursorOn());
             }
-            else if (Input.GetKey(KeyCode.P) && !isCoolTime) // 마우스 커서 표시
-            {
-                StartCoroutine(test());
-            }
 
 
             

@@ -19,18 +19,18 @@ public class DialogueManager
         set
         {
             _dialoueDict = value;
-            FlushDialogueQueue();
+            InitDialogueFlush();
         }
     }
 
     // 스크립트 + 퀘스트 정보를 서버로 부터 획득 후 최종적으로 오브젝트를 초기화할 Job 객체
-    public class DialougeTask
+    public class QuestScriptTask
     {
         Action<(string[], int)> _action;
         string[] _scripts;
         int _scriptId;
 
-        public DialougeTask(Action<(string[], int)> action, (string[] scripts, int scriptId) scriptsAndId)
+        public QuestScriptTask(Action<(string[], int)> action, (string[] scripts, int scriptId) scriptsAndId)
         {
             _action = action;
             _scripts = scriptsAndId.scripts;
@@ -52,17 +52,17 @@ public class DialogueManager
     }
 
     // 대화 스크립트 초기화를 원하는 NPC 오브젝트 등록 처리
-    public void RegisterGetDialouge(NPCObject npc, int scriptId)
+    public void InitDialogueRegister(NPCObject npc, int scriptId)
     {
         AddNCPQueue(npc, scriptId);
         if (DialogueDict != null) // 초기화 완료시 대기 없이 바로 처리
         {
-            FlushDialogueQueue();
+            InitDialogueFlush();
         }
     }
 
     // 대화 스크립트 초기화 대기 큐 flush 처리
-    public void FlushDialogueQueue()
+    public void InitDialogueFlush()
     {
         // 대화 스크립트 초기화를 원하는 NPC가 있다면 현재 쓰레드에서 처리
         while(_npcObjects.Count != 0)
@@ -72,8 +72,8 @@ public class DialogueManager
             int scriptId = nPCAndScriptId.scriptId;
 
             // 퀘스트 매니저에게 초기화 등록을 요청해야 함
-            DialougeTask dialogueInitTask = new DialougeTask(npc.InitDialouge, GetDialogueAndQuest(npc.ObjectID, scriptId));
-            Managers.Quest.QuestDialogueRegister(dialogueInitTask);
+            QuestScriptTask dialogueInitTask = new QuestScriptTask(npc.InitDialouge, GetDialogueAndQuest(npc.ObjectID, scriptId));
+            Managers.Quest.QuestScriptRegister(dialogueInitTask);
         }
     }
 

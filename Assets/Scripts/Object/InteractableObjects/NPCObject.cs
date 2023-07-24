@@ -77,7 +77,7 @@ public class NPCObject : InteractableObject
     // 퀘스트 진행 상태에 따른 NPC 대화 스크립트 갱신
     public void RefreshScript()
     {
-        Managers.Dialouge.RegisterGetDialouge(this, CurNPCScriptId); // 스크립트 처리 등록
+        Managers.Dialouge.InitDialogueRegister(this, CurNPCScriptId); // 스크립트 처리 등록
     }
 
     // --------------------------------------------------------------
@@ -155,7 +155,7 @@ public class NPCObject : InteractableObject
                 CurNPCScriptId += 3;
 
                 // 스크립트 처리 재등록
-                Managers.Dialouge.RegisterGetDialouge(this, CurNPCScriptId); 
+                Managers.Dialouge.InitDialogueRegister(this, CurNPCScriptId); 
 
             }
             else // 퀘스트를 받기 전 상태

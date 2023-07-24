@@ -242,7 +242,7 @@ public class QuestManager
                 IsAddedPlayerQuests = true;
         }
         
-        FlushQuestDialogueQueue();
+        QuestScriptFlush();
 
     }
     // -------------------------------------------------------------------------
@@ -390,25 +390,28 @@ public class QuestManager
     // 퀘스트 및 대화 스크립트가 연동되어 있고, 두 개의 정보가 서버로부터
     // 초기화 되어야 오브젝트들의 초기화를 진행할 수 있다.
 
-    Queue<DialougeTask> _questDialogueTasks = new Queue<DialougeTask>();
+    Queue<QuestScriptTask> _questScriptTasks = new Queue<QuestScriptTask>();
 
-    public void QuestDialogueRegister(DialougeTask dialougeTask)
+    // NPC Dialogue 처리 등록
+    public void QuestScriptRegister(QuestScriptTask dialougeTask)
     {
         lock (_lock)
         {
-            _questDialogueTasks.Enqueue(dialougeTask);
-            FlushQuestDialogueQueue();
+            _questScriptTasks.Enqueue(dialougeTask);
+            QuestScriptFlush();
         }
     }
 
-    public void FlushQuestDialogueQueue()
+    // NPC Dialogue 실제 처리
+    public void QuestScriptFlush()
     {
         if (IsRecievedPlayerQuestsByServer && IsAddedPlayerQuests) // 퀘스트 정보를 서버로 부터 받아 초기화 했다면
         {
-            while (_questDialogueTasks.Count > 0)
+            // 등록된 모든 NPC에 대해 스크립트 초기화
+            while (_questScriptTasks.Count > 0)
             {
-                DialougeTask dialougeTask = _questDialogueTasks.Dequeue();
-                dialougeTask.Excute();
+                QuestScriptTask questScriptTask = _questScriptTasks.Dequeue();
+                questScriptTask.Excute();
             }
         }
         

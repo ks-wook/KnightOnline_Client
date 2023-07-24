@@ -397,7 +397,7 @@ class PacketHandler
 		}
 
 		Managers.Quest.IsRecievedPlayerQuestsByServer = true;
-		Managers.Quest.FlushQuestDialogueQueue();
+		Managers.Quest.QuestScriptFlush();
 	}
 
 	// 플레이어 경험치 획득 시 패킷 처리
